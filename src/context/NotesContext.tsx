@@ -1,39 +1,67 @@
-import { createContext, useState, useContext, ReactNode, useCallback } from "react";
-import { notesData as initialNotesData } from "@/data/notesData";
-import { colorPalettes } from "@/components/notes/colorPalettes";
-
-type ColorKey = keyof typeof colorPalettes;
-
-interface Note {
-    id: number;
-    content: string;
-    color: ColorKey;
-    x: number;
-    y: number;
-}
+import { Note } from "@/types/note";
+import { NoteFrontEnd } from "@/types/noteFrontend";
+import { NotePayload } from "@/types/notePayload";
+import { createContext, useState, useContext, ReactNode, useCallback, useEffect } from "react";
 
 interface NotesContextType {
-    notes: Note[];
-    activeNoteId: number | null;
-    setActiveNoteId: (id: number | null) => void;
-    addNote: (note: Omit<Note, "id">) => void;
+    notes: NoteFrontEnd[];
+    activeNoteId: string | null;
+    setActiveNoteId: (id: string | null) => void;
+    addNote: (note: Note) => void;
+    updateNote: (noteId: string, note: NotePayload) => void;
+    loading: boolean;
 }
 
 const NotesContext = createContext<NotesContextType | undefined>(undefined);
 
 export const NotesProvider = ({ children }: { children: ReactNode }) => {
-    const [notes, setNotes] = useState<Note[]>(initialNotesData);
-    const [activeNoteId, setActiveNoteId] = useState<number | null>(null);
+    const [notes, setNotes] = useState<NoteFrontEnd[]>([]);
+    const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const addNote = useCallback((note: Omit<Note, "id">) => {
-        setNotes((prevNotes) => [
-            ...prevNotes,
-            { id: prevNotes.length > 0 ? prevNotes[prevNotes.length - 1].id + 1 : 1, ...note },
-        ]);
+    const addNote = useCallback(async (note: Note) => {
+        const res = await fetch("/api/notes", {
+            method: "POST",
+            body: JSON.stringify(note)
+        });
+        if (res.ok) {
+            const newNote = await res.json();
+            setNotes(prevNotes => [...prevNotes, newNote]);
+        }
     }, []);
 
+    const updateNote = useCallback(async (noteId: string, note: NotePayload) => {
+        const res = await fetch(`/api/notes/${noteId}`, {
+            method: "PUT",
+            body: JSON.stringify(note)
+        });
+        if (res.ok) {
+            console.log("Note updated successfully");
+        }
+    }, []);
+
+    const getNotes = useCallback(async (): Promise<NoteFrontEnd[]> => {
+        try {
+            const res = await fetch("/api/notes");
+            if (!res.ok) throw new Error("Failed to fetch notes");
+            const notes = await res.json();
+            return notes;
+        } catch (error) {
+            console.error("Error fetching notes:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+
+    useEffect(() => {
+        getNotes().then(setNotes);
+    }, [getNotes]);
+
+    const value = { notes, activeNoteId, setActiveNoteId, addNote, loading, updateNote };
     return (
-        <NotesContext.Provider value={{ notes, activeNoteId, setActiveNoteId, addNote }}>
+        <NotesContext.Provider value={value}>
             {children}
         </NotesContext.Provider>
     );

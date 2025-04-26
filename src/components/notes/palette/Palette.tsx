@@ -1,7 +1,7 @@
 import { FilePlus } from "lucide-react";
-import { colorPalettes } from "./colorPalettes";
+import { colorPalettes } from "../../../lib/colorPalettes";
 import PaletteItem from "./PaletteItem";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 
 interface PaletteProps {
     onAddNote: () => void;
