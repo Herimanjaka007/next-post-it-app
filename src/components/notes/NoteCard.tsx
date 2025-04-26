@@ -1,31 +1,39 @@
 "use client"
 
 import { Trash2 } from "lucide-react"
-import { ChangeEvent, useRef, useState } from "react"
-import { colorPalettes } from "./colorPalettes"
-import { useCardReposition } from "./useCardReposition"
-import { useAdjustNoteHeight } from "./useAdjustNoteHeight"
+import React, { ChangeEvent, useRef, useState } from "react"
+import { colorPalettes } from "../../lib/colorPalettes"
+import { useCardReposition } from "../../hooks/notes/useCardReposition"
+import { useAdjustNoteHeight } from "../../hooks/notes/useAdjustNoteHeight"
+import { Note } from "@/types/note"
+import { useWaitUpdate } from "@/hooks/notes/useWaitUpdate"
+import { NotePayload } from "@/types/notePayload"
 
 interface NoteCardProps {
-    color?: keyof typeof colorPalettes
-    content?: string
-    x?: number
-    y?: number
+    noteData: Note
     zIndex?: number
     onFocus?: () => void
+    onUpdate?: (content: NotePayload) => void
 }
 
-const NoteCard = ({ color = "cyan", content = "", x = 0, y = 0, zIndex = 10, onFocus }: NoteCardProps) => {
-    const [note, setNote] = useState(content)
-    const articleRef = useRef<HTMLDivElement>(null)
-    const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-    const { position, cardRef, handleMouseDown } = useCardReposition(x, y)
-
-    useAdjustNoteHeight(textareaRef, articleRef, note)
+const NoteCard = ({ noteData, zIndex = 10, onFocus, onUpdate }: NoteCardProps) => {
+    const { color = "cyan", content = "", x = 0, y = 0 } = noteData;
+    const [note, setNote] = useState(content);
+    const articleRef = useRef<HTMLDivElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const { position, cardRef, handleMouseDown } = useCardReposition(x, y, onUpdate!);
+    useAdjustNoteHeight(textareaRef, articleRef, note);
+    const waitAndUpdate = useWaitUpdate({ content: note }, onUpdate!, 3);
 
     const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        setNote(e.target.value)
+        const content = e.target.value;
+        setNote(content);
+        waitAndUpdate();
+    }
+
+    const handleChangePosition = (e: React.MouseEvent) => {
+        handleMouseDown(e);
+        if (onFocus) onFocus();
     }
 
     const palette = colorPalettes[color] || colorPalettes.cyan
@@ -35,12 +43,10 @@ const NoteCard = ({ color = "cyan", content = "", x = 0, y = 0, zIndex = 10, onF
             className={`rounded-lg border shadow-sm w-1/4 overflow-hidden ${palette.cardBg}`}
             style={{ position: "absolute", left: position.x, top: position.y, zIndex }}
         >
-            <header onMouseDown={(e) => {
-                handleMouseDown(e)
-                if (onFocus) {
-                    onFocus()
-                }
-            }} className="w-full flex items-center cursor-move">
+            <header
+                onMouseDown={handleChangePosition}
+                className="w-full flex items-center cursor-move"
+            >
                 <span className="text-center p-3">
                     <Trash2 className="cursor-pointer" />
                 </span>

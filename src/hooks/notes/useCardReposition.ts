@@ -1,10 +1,13 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useWaitUpdate } from "./useWaitUpdate";
+import { NotePayload } from "@/types/notePayload";
 
-export function useCardReposition(initialX = 0, initialY = 0) {
+export function useCardReposition(initialX = 0, initialY = 0, onUpdate: (note: NotePayload) => void) {
     const [position, setPosition] = useState({ x: initialX, y: initialY });
     const [dragging, setDragging] = useState(false);
     const dragStartPos = useRef<{ mouseX: number; mouseY: number; cardX: number; cardY: number } | null>(null);
     const cardRef = useRef<HTMLDivElement>(null);
+    const waitAndUpdate = useWaitUpdate(position, onUpdate, 1.5);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         if (cardRef.current) {
@@ -39,8 +42,9 @@ export function useCardReposition(initialX = 0, initialY = 0) {
 
     const handleMouseUp = useCallback(() => {
         setDragging(false);
+        waitAndUpdate();
         dragStartPos.current = null;
-    }, []);
+    }, [waitAndUpdate]);
 
     useEffect(() => {
         if (dragging) {
