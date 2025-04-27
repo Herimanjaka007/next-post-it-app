@@ -1,10 +1,8 @@
-import { colorPalettes } from "@/lib/colorPalettes";
-
-type ColorKey = keyof typeof colorPalettes;
+import { Color } from "./Color";
 
 interface Note {
     content: string;
-    color: ColorKey;
+    color: Color;
     x: number;
     y: number;
 }

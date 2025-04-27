@@ -1,3 +1,4 @@
+import { Color } from "@/types/Color";
 import { Note } from "@/types/note";
 import { NoteFrontEnd } from "@/types/noteFrontend";
 import { NotePayload } from "@/types/notePayload";
@@ -10,6 +11,8 @@ interface NotesContextType {
     addNote: (note: Note) => void;
     updateNote: (noteId: string, note: NotePayload) => void;
     deleteNote: (noteId: string) => void;
+    selectedColor: Color;
+    setSelectedColor: (color: Color) => void;
     loading: boolean;
 }
 
@@ -18,6 +21,7 @@ const NotesContext = createContext<NotesContextType | undefined>(undefined);
 export const NotesProvider = ({ children }: { children: ReactNode }) => {
     const [notes, setNotes] = useState<NoteFrontEnd[]>([]);
     const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
+    const [selectedColor, setSelectedColor] = useState<Color>("cyan");
     const [loading, setLoading] = useState(true);
 
     const addNote = useCallback(async (note: Note) => {
@@ -70,7 +74,17 @@ export const NotesProvider = ({ children }: { children: ReactNode }) => {
         getNotes().then(setNotes);
     }, [getNotes]);
 
-    const value = { notes, activeNoteId, setActiveNoteId, addNote, loading, updateNote, deleteNote };
+    const value = {
+        loading,
+        notes,
+        activeNoteId,
+        setActiveNoteId,
+        addNote,
+        updateNote,
+        deleteNote,
+        selectedColor,
+        setSelectedColor
+    };
     return (
         <NotesContext.Provider value={value}>
             {children}

@@ -39,7 +39,7 @@ const NoteCard = ({ noteData, zIndex = 10, onFocus, onDelete }: NoteCardProps) =
     return (
         <section
             ref={cardRef}
-            className={`rounded-lg shadow-lg w-1/4 overflow-hidden ${palette.cardBg}`}
+            className={`rounded-lg w-1/4 overflow-hidden ${palette.cardBg}`}
             style={{ position: "absolute", left: position.x, top: position.y, zIndex }}
         >
             <header
