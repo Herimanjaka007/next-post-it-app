@@ -12,21 +12,22 @@ interface NoteCardProps {
     noteData: NoteFrontEnd
     zIndex?: number
     onFocus: ({ id }: NoteFrontEnd) => void
+    onDelete: () => void
 }
 
-const NoteCard = ({ noteData, zIndex = 10, onFocus }: NoteCardProps) => {
-    const { color, content } = noteData;
+const NoteCard = ({ noteData, zIndex = 10, onFocus, onDelete }: NoteCardProps) => {
+    const { id, color, content, x, y } = noteData;
     const [note, setNote] = useState(content);
     const articleRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const { position, cardRef, handleMouseDown } = useCardReposition(noteData);
+    const { position, cardRef, handleMouseDown } = useCardReposition(id, { x, y });
     useAdjustNoteHeight(textareaRef, articleRef, note);
-    const { loading, waitAndUpdate } = useWaitUpdate({ ...noteData, content: note }, 3);
+    const { loading, waitAndUpdate } = useWaitUpdate(id, 3);
 
     const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         const content = e.target.value;
         setNote(content);
-        waitAndUpdate();
+        waitAndUpdate({ content });
     }
 
     const handleChangePosition = (e: React.MouseEvent) => {
@@ -38,14 +39,14 @@ const NoteCard = ({ noteData, zIndex = 10, onFocus }: NoteCardProps) => {
     return (
         <section
             ref={cardRef}
-            className={`rounded-lg border shadow-sm w-1/4 overflow-hidden ${palette.cardBg}`}
+            className={`rounded-lg shadow-lg w-1/4 overflow-hidden ${palette.cardBg}`}
             style={{ position: "absolute", left: position.x, top: position.y, zIndex }}
         >
             <header
                 onMouseDown={handleChangePosition}
                 className="w-full flex items-center cursor-move"
             >
-                <span className="text-center p-3">
+                <span className="text-center p-3" onClick={onDelete}>
                     <Trash2 className="cursor-pointer" />
                 </span>
                 {

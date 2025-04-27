@@ -6,7 +6,7 @@ import { Loader } from "lucide-react"
 import { NoteFrontEnd } from "@/types/noteFrontend"
 
 const NoteGrid = () => {
-    const { notes, activeNoteId, setActiveNoteId, addNote, loading } = useNotes()
+    const { notes, activeNoteId, setActiveNoteId, addNote, loading, deleteNote } = useNotes()
 
     const handleFocus = useCallback(({ id }: NoteFrontEnd) => {
         setActiveNoteId(id)
@@ -15,7 +15,7 @@ const NoteGrid = () => {
     const handleAddNote = useCallback(() => {
         addNote({
             content: "New note",
-            color: "cyan",
+            color: "red",
             x: 100,
             y: 100,
         })
@@ -39,6 +39,7 @@ const NoteGrid = () => {
                                 noteData={note}
                                 zIndex={zIndex}
                                 onFocus={handleFocus}
+                                onDelete={() => deleteNote(id)}
                             />
                         )
                     })

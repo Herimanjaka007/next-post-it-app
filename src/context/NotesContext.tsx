@@ -9,6 +9,7 @@ interface NotesContextType {
     setActiveNoteId: (id: string | null) => void;
     addNote: (note: Note) => void;
     updateNote: (noteId: string, note: NotePayload) => void;
+    deleteNote: (noteId: string) => void;
     loading: boolean;
 }
 
@@ -40,6 +41,16 @@ export const NotesProvider = ({ children }: { children: ReactNode }) => {
         }
     }, []);
 
+    const deleteNote = useCallback(async (noteId: string) => {
+        const res = await fetch(`/api/notes/${noteId}`, {
+            method: "DELETE",
+        });
+        if (res.ok) {
+            const newNotes = [...notes].filter(note => note.id !== noteId);
+            setNotes(newNotes);
+        }
+    }, [notes]);
+
     const getNotes = useCallback(async (): Promise<NoteFrontEnd[]> => {
         try {
             const res = await fetch("/api/notes");
@@ -59,7 +70,7 @@ export const NotesProvider = ({ children }: { children: ReactNode }) => {
         getNotes().then(setNotes);
     }, [getNotes]);
 
-    const value = { notes, activeNoteId, setActiveNoteId, addNote, loading, updateNote };
+    const value = { notes, activeNoteId, setActiveNoteId, addNote, loading, updateNote, deleteNote };
     return (
         <NotesContext.Provider value={value}>
             {children}
