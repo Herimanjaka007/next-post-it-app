@@ -1,13 +1,13 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useWaitUpdate } from "./useWaitUpdate";
-import { NoteFrontEnd } from "@/types/noteFrontend";
+import { NotePayload } from "@/types/notePayload";
 
-export function useCardReposition(note: NoteFrontEnd) {
-    const [position, setPosition] = useState({ x: note.x, y: note.y });
+export function useCardReposition(noteId: string, { x, y }: NotePayload) {
+    const [position, setPosition] = useState({ x, y });
     const [dragging, setDragging] = useState(false);
     const dragStartPos = useRef<{ mouseX: number; mouseY: number; cardX: number; cardY: number } | null>(null);
     const cardRef = useRef<HTMLDivElement>(null);
-    const { waitAndUpdate } = useWaitUpdate({ ...note, ...position }, 1.5);
+    const { waitAndUpdate } = useWaitUpdate(noteId, 1.5);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         if (cardRef.current) {
@@ -15,8 +15,8 @@ export function useCardReposition(note: NoteFrontEnd) {
             dragStartPos.current = {
                 mouseX: e.clientX,
                 mouseY: e.clientY,
-                cardX: position.x,
-                cardY: position.y,
+                cardX: position.x!,
+                cardY: position.y!,
             };
             e.preventDefault();
         }
@@ -42,9 +42,9 @@ export function useCardReposition(note: NoteFrontEnd) {
 
     const handleMouseUp = useCallback(() => {
         setDragging(false);
-        waitAndUpdate();
+        waitAndUpdate(position);
         dragStartPos.current = null;
-    }, [waitAndUpdate]);
+    }, [waitAndUpdate, position]);
 
     useEffect(() => {
         if (dragging) {

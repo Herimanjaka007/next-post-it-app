@@ -1,4 +1,4 @@
-import { createNote, getNotes, updateNote } from "@/services/noteService";
+import { createNote, getNotes } from "@/services/noteService";
 import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async () => {
@@ -14,7 +14,7 @@ export const GET = async () => {
 export const POST = async (req: NextRequest) => {
     const note = await req.json();
     try {
-        const newNote = createNote(note);
+        const newNote = await createNote(note);
         return NextResponse.json(newNote, { status: 201 });
     } catch (error) {
         console.error("Error when creating note:", error);

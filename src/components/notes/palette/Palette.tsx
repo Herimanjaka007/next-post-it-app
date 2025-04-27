@@ -15,7 +15,7 @@ const Palette = ({ onAddNote }: PaletteProps) => {
             </Button>
             {Object
                 .values(colorPalettes)
-                .map((palette, index) => <PaletteItem key={index} colorClass={palette["articleBg"]} />)}
+                .map((palette, index) => <PaletteItem key={index} colorClass={palette["cardBg"]} />)}
         </section>
     );
 }

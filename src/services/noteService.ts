@@ -31,3 +31,9 @@ export const updateNote = async (noteId: string, payload: NotePayload) => {
     await connectToDatabase();
     await NoteModel.findByIdAndUpdate(noteId, payload);
 }
+
+export const deleteNote = async (noteId: string) => {
+    await connectToDatabase();
+    await NoteModel.findByIdAndDelete(noteId);
+    return true;
+}
