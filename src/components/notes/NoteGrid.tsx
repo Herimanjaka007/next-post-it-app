@@ -3,12 +3,12 @@ import NoteCard from "./NoteCard"
 import Palette from "./palette/Palette"
 import { useNotes } from "@/context/NotesContext"
 import { Loader } from "lucide-react"
-import { NotePayload } from "@/types/notePayload"
+import { NoteFrontEnd } from "@/types/noteFrontend"
 
 const NoteGrid = () => {
-    const { notes, activeNoteId, setActiveNoteId, addNote, loading, updateNote } = useNotes()
+    const { notes, activeNoteId, setActiveNoteId, addNote, loading } = useNotes()
 
-    const handleFocus = useCallback((id: string) => {
+    const handleFocus = useCallback(({ id }: NoteFrontEnd) => {
         setActiveNoteId(id)
     }, [setActiveNoteId])
 
@@ -38,8 +38,7 @@ const NoteGrid = () => {
                                 key={id}
                                 noteData={note}
                                 zIndex={zIndex}
-                                onFocus={() => handleFocus(id)}
-                                onUpdate={(newContent: NotePayload) => updateNote(id, newContent)}
+                                onFocus={handleFocus}
                             />
                         )
                     })
