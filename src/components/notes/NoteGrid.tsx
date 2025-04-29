@@ -1,4 +1,6 @@
-import { useCallback } from "react"
+"use client"
+
+import { useCallback, useRef } from "react"
 import NoteCard from "./NoteCard"
 import Palette from "./palette/Palette"
 import { useNotes } from "@/context/NotesContext"
@@ -7,6 +9,7 @@ import { NoteFrontEnd } from "@/types/noteFrontend"
 
 const NoteGrid = () => {
     const { notes, activeNoteId, setActiveNoteId, addNote, loading, deleteNote, selectedColor } = useNotes()
+    const noteContainerRef = useRef<HTMLDivElement>(null);
 
     const handleFocus = useCallback(({ id }: NoteFrontEnd) => {
         setActiveNoteId(id)
@@ -22,11 +25,14 @@ const NoteGrid = () => {
     }, [addNote, selectedColor])
 
     return (
-        <section className="absolute top-0 left-0 w-full h-full note-grid bg-slate-900">
+        <section
+            ref={noteContainerRef}
+            className="relative top-0 min-h-[100vh] overflow-auto w-full note-grid bg-slate-900"
+        >
             <Palette onAddNote={handleAddNote} />
             {
                 loading ?
-                    <div className="w-full h-full flex justify-center items-center">
+                    <div className="absolute inset-0 min-h-full flex justify-center items-center">
                         <Loader className="animate-spin text-white" width={60} height={60} />
                     </div>
                     :
@@ -40,11 +46,12 @@ const NoteGrid = () => {
                                 zIndex={zIndex}
                                 onFocus={handleFocus}
                                 onDelete={() => deleteNote(id)}
+                                noteContainerRef={noteContainerRef}
                             />
                         )
                     })
             }
-        </section>
+        </ section>
     )
 }
 
