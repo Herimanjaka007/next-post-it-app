@@ -1,3 +1,5 @@
+"use client"
+
 import { Color } from "@/types/Color";
 import { Note } from "@/types/note";
 import { NoteFrontEnd } from "@/types/noteFrontend";

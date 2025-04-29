@@ -12,9 +12,9 @@ interface PaletteProps {
 const Palette = ({ onAddNote }: PaletteProps) => {
     const { selectedColor, setSelectedColor } = useNotes()
     return (
-        <section className="absolute bottom-5 flex justify-around right-20 shadow-md rounded-4xl bg-slate-700 p-2 w-1/4 z-100">
-            <Button className="cursor-pointer bg-yellow-400 hover:bg-yellow-500 hover:scale-105 rounded-4xl text-black" onClick={onAddNote}>
-                NEW<Plus className="text-black cursor-pointer" />
+        <section className="fixed left-10 md:left-[35vw] space-x-4 top-5 flex justify-around shadow-md rounded-4xl bg-slate-700 p-2 z-100">
+            <Button className="cursor-pointer bg-gray-900 hover:bg-gray-950 hover:scale-105 rounded-4xl" onClick={onAddNote}>
+                NEW<Plus className="cursor-pointer" />
             </Button>
             {
                 Object

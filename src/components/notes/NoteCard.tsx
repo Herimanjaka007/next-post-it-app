@@ -1,7 +1,7 @@
 "use client"
 
 import { Loader, Trash2 } from "lucide-react"
-import React, { ChangeEvent, useRef, useState } from "react"
+import { ChangeEvent, useRef, useState } from "react"
 import { useWaitUpdate } from "@/hooks/notes/useWaitUpdate"
 import { NoteFrontEnd } from "@/types/noteFrontend"
 import { useCardReposition } from "@/hooks/notes/useCardReposition"
@@ -13,14 +13,15 @@ interface NoteCardProps {
     zIndex?: number
     onFocus: ({ id }: NoteFrontEnd) => void
     onDelete: () => void
+    noteContainerRef: { current: HTMLDivElement | null }
 }
 
-const NoteCard = ({ noteData, zIndex = 10, onFocus, onDelete }: NoteCardProps) => {
+const NoteCard = ({ noteData, zIndex = 10, onFocus, onDelete, noteContainerRef }: NoteCardProps) => {
     const { id, color, content, x, y } = noteData;
     const [note, setNote] = useState(content);
     const articleRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const { position, cardRef, handleMouseDown } = useCardReposition(id, { x, y });
+    const { position, cardRef, handleMouseDown } = useCardReposition(id, { x, y }, noteContainerRef);
     useAdjustNoteHeight(textareaRef, articleRef, note);
     const { loading, waitAndUpdate } = useWaitUpdate(id, 3);
 
@@ -39,7 +40,7 @@ const NoteCard = ({ noteData, zIndex = 10, onFocus, onDelete }: NoteCardProps) =
     return (
         <section
             ref={cardRef}
-            className={`rounded-lg w-1/4 overflow-hidden ${palette.cardBg}`}
+            className={`rounded-lg w-[200px] lg:w-[350px] overflow-hidden ${palette.cardBg}`}
             style={{ position: "absolute", left: position.x, top: position.y, zIndex }}
         >
             <header
